@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: cypherbank-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-cypherbank123}
+      MYSQL_DATABASE: cypherbank
+      MYSQL_USER: ${DB_USERNAME:-cypherbank}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-cypherbank123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+  # Eureka Server
+  eureka-server:
+    build: ./eureka-server
+    container_name: cypherbank-eureka
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=${DB_USERNAME:-cypherbank}
+      - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
+    ports:
+      - "8761:8761"
+    depends_on:
+      - mysql
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: cypherbank-gateway
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+  # User Service
+  user-service:
+    build: ./user-service
+    container_name: cypherbank-user-service
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=user-service
+      - DB_USERNAME=${DB_USERNAME:-cypherbank}
+      - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+  # Account Service
+  account-service:
+    build: ./account-service
+    container_name: cypherbank-account-service
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=account-service
+      - DB_USERNAME=${DB_USERNAME:-cypherbank}
+      - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+  # Transaction Service
+  transaction-service:
+    build: ./transaction-service
+    container_name: cypherbank-transaction-service
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=account-service
+      - DB_USERNAME=${DB_USERNAME:-cypherbank}
+      - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    container_name: cypherbank-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - cypherbank-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  cypherbank-network:
+    driver: bridge
+

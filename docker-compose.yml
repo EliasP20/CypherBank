@@ -1,0 +1,70 @@
+services:
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - cypherbank-network
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - cypherbank-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+    networks:
+      - cypherbank-network
+
+  account-service:
+    build:
+      context: .
+      dockerfile: account-service/Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka-server
+      - user-service
+    networks:
+      - cypherbank-network
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: transaction-service/Dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      - eureka-server
+      - account-service
+    networks:
+      - cypherbank-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - cypherbank-network
+
+networks:
+  cypherbank-network:
+    driver: bridge
+
+
