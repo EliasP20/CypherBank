@@ -5,10 +5,10 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:user-service}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME_USER_SERVICE}
     driver-class-name: com.mysql.cj.jdbc.Driver
-        username: ${DB_USERNAME:elias20}
-        password: ${DB_PASSWORD:ItsEliastyles2}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

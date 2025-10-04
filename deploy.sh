@@ -38,3 +38,4 @@ echo ""
 echo "🛑 To stop: docker-compose -f docker-compose.prod.yml down"
 echo "📝 To view logs: docker-compose -f docker-compose.prod.yml logs -f"
 
+

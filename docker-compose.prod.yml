@@ -57,7 +57,7 @@ services:
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_NAME=user-service
+      - DB_NAME_USER_SERVICE=${DB_NAME_USER_SERVICE:-user-service}
       - DB_USERNAME=${DB_USERNAME:-cypherbank}
       - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
       - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
@@ -77,7 +77,7 @@ services:
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_NAME=account-service
+      - DB_NAME_ACCOUNT_SERVICE=${DB_NAME_ACCOUNT_SERVICE:-account-service}
       - DB_USERNAME=${DB_USERNAME:-cypherbank}
       - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
       - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
@@ -97,7 +97,7 @@ services:
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_NAME=account-service
+      - DB_NAME_TRANSACTION_SERVICE=${DB_NAME_TRANSACTION_SERVICE:-transaction-service}
       - DB_USERNAME=${DB_USERNAME:-cypherbank}
       - DB_PASSWORD=${DB_PASSWORD:-cypherbank123}
       - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
@@ -128,4 +128,5 @@ volumes:
 networks:
   cypherbank-network:
     driver: bridge
+
 
